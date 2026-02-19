@@ -4,15 +4,20 @@ require __DIR__ . '/vendor/autoload.php';
 
 use SergiX44\Nutgram\Nutgram;
 use SergiX44\Nutgram\RunningMode\Webhook;
+use Dotenv\Dotenv;
 
-$bot = new Nutgram($_ENV['TOKEN'] ?? '');  // Directo de Railway
+// Cargar variables (aunque en Railway no es necesario, lo dejamos por si acaso)
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 
-// FORZAMOS MODO WEBHOOK SIN SECRET (temporal para debug)
-$bot->setRunningMode(new Webhook());
+$bot = new Nutgram($_ENV['TOKEN']);
 
-// Logging para ver TODO (guarda en logs/bot.log)
+// FORZAMOS MODO WEBHOOK CON EL SECRET EXACTO
+$bot->setRunningMode(new Webhook(secretToken: 'shizuku_secret_2026_random_largo'));
+
+// Logging básico para debug (opcional, pero útil ahora)
 $bot->onException(function (Exception $e) {
-    file_put_contents('logs/bot.log', $e->getMessage() . PHP_EOL, FILE_APPEND);
+    file_put_contents('logs/error.log', date('Y-m-d H:i:s') . ' - ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
 });
 
 // ==================== COMANDOS SHIZUKU ====================
@@ -35,6 +40,22 @@ $bot->onCommand('vacuum', function (Nutgram $bot) {
 // ==================== CUALQUIER TEXTO ====================
 
 $bot->onText('.*', function (Nutgram $bot) {
+    $chatId = $bot->getChat()->getId();
+    $text = $bot->getMessage()->getText() ?? 'Nothing...';
+
+    if (rand(1, 5) === 1) {
+        shizukuSendMessage($bot, $chatId, "Wait... have we met before? Anyway... " . $text);
+    } else {
+        shizukuSendMessage($bot, $chatId, "Your words are... " . $text);
+    }
+});
+
+// ==================== EJECUCIÓN ====================
+
+// Log para confirmar que recibe updates
+file_put_contents('logs/webhook.log', date('Y-m-d H:i:s') . " - Update recibido\n", FILE_APPEND);
+
+$bot->run();$bot->onText('.*', function (Nutgram $bot) {
     $chatId = $bot->getChat()->getId();
     $text = $bot->getMessage()->getText() ?? 'Nothing...';
 
