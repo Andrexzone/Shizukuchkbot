@@ -7,7 +7,7 @@ $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 $token = $_ENV['TOKEN'];
-$webhookUrl = "https://TU-DOMINIO.com/bot.php";   // ← CAMBIA ESTO
+$webhookUrl = "shizukuchkbot-production.up.railway.app/bot.php";   // ← CAMBIA ESTO
 
 $url = "https://api.telegram.org/bot{$token}/setWebhook?url=" . urlencode($webhookUrl);
 
