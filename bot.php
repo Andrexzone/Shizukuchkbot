@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/vendor/autoload.php';  // ← Solo esto queda
+require __DIR__ . '/vendor/autoload.php';
 
 use SergiX44\Nutgram\Nutgram;
 use SergiX44\Nutgram\RunningMode\Webhook;
@@ -11,8 +11,13 @@ $dotenv->load();
 
 $bot = new Nutgram($_ENV['TOKEN']);
 
-// FORZAMOS MODO WEBHOOK
-$bot->setRunningMode(new Webhook(secretToken: $_ENV['WEBHOOK_SECRET']));
+// FORZAMOS MODO WEBHOOK SIN SECRET (temporal para debug)
+$bot->setRunningMode(new Webhook());
+
+// Logging para ver TODO (guarda en /app/logs/bot.log)
+$bot->onException(function (Exception $e) {
+    file_put_contents('/app/logs/bot.log', $e->getMessage() . PHP_EOL, FILE_APPEND);
+});
 
 // ==================== COMANDOS SHIZUKU ====================
 
@@ -46,14 +51,7 @@ $bot->onText('.*', function (Nutgram $bot) {
 
 // ==================== EJECUCIÓN ====================
 
-$bot->run();    // Rol de olvidadiza
-    if (rand(1, 5) === 1) {
-        shizukuSendMessage($bot, $chatId, "Wait... have we met before? Anyway... " . $text);
-    } else {
-        shizukuSendMessage($bot, $chatId, "Your words are... " . $text);
-    }
-});
+// Log para ver si recibe updates
+file_put_contents('/app/logs/bot.log', "Received update: " . file_get_contents('php://input') . PHP_EOL, FILE_APPEND);
 
-// ==================== INICIO DEL WEBHOOK ====================
-
-$bot->run();   // ← Esto maneja la petición de Telegram automáticamente
+$bot->run(); 
