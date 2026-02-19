@@ -1,15 +1,18 @@
 <?php
 
-require __DIR__ . '/vendor/autoload.php';
-require __DIR__ . '/helpers.php';
+require __DIR__ . '/vendor/autoload.php';  // ← Solo esto queda
 
 use SergiX44\Nutgram\Nutgram;
+use SergiX44\Nutgram\RunningMode\Webhook;
 use Dotenv\Dotenv;
 
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 $bot = new Nutgram($_ENV['TOKEN']);
+
+// FORZAMOS MODO WEBHOOK
+$bot->setRunningMode(new Webhook(secretToken: $_ENV['WEBHOOK_SECRET']));
 
 // ==================== COMANDOS SHIZUKU ====================
 
@@ -28,13 +31,22 @@ $bot->onCommand('vacuum', function (Nutgram $bot) {
     shizukuSendMessage($bot, $chatId, "Blinky is ready... What should I suck in today?");
 });
 
-// ==================== CUALQUIER MENSAJE DE TEXTO ====================
+// ==================== CUALQUIER TEXTO ====================
 
 $bot->onText('.*', function (Nutgram $bot) {
     $chatId = $bot->getChat()->getId();
-    $text = $bot->getMessage()->getText();
-    
-    // Rol de olvidadiza
+    $text = $bot->getMessage()->getText() ?? 'Nothing...';
+
+    if (rand(1, 5) === 1) {
+        shizukuSendMessage($bot, $chatId, "Wait... have we met before? Anyway... " . $text);
+    } else {
+        shizukuSendMessage($bot, $chatId, "Your words are... " . $text);
+    }
+});
+
+// ==================== EJECUCIÓN ====================
+
+$bot->run();    // Rol de olvidadiza
     if (rand(1, 5) === 1) {
         shizukuSendMessage($bot, $chatId, "Wait... have we met before? Anyway... " . $text);
     } else {
