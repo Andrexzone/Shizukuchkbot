@@ -4,19 +4,15 @@ require __DIR__ . '/vendor/autoload.php';
 
 use SergiX44\Nutgram\Nutgram;
 use SergiX44\Nutgram\RunningMode\Webhook;
-use Dotenv\Dotenv;
 
-$dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
-$bot = new Nutgram($_ENV['TOKEN']);
+$bot = new Nutgram($_ENV['TOKEN'] ?? '');  // Directo de Railway
 
 // FORZAMOS MODO WEBHOOK SIN SECRET (temporal para debug)
 $bot->setRunningMode(new Webhook());
 
-// Logging para ver TODO (guarda en /app/logs/bot.log)
+// Logging para ver TODO (guarda en logs/bot.log)
 $bot->onException(function (Exception $e) {
-    file_put_contents('/app/logs/bot.log', $e->getMessage() . PHP_EOL, FILE_APPEND);
+    file_put_contents('logs/bot.log', $e->getMessage() . PHP_EOL, FILE_APPEND);
 });
 
 // ==================== COMANDOS SHIZUKU ====================
@@ -51,7 +47,7 @@ $bot->onText('.*', function (Nutgram $bot) {
 
 // ==================== EJECUCIÓN ====================
 
-// Log para ver si recibe updates
-file_put_contents('/app/logs/bot.log', "Received update: " . file_get_contents('php://input') . PHP_EOL, FILE_APPEND);
+// Log para ver updates recibidos
+file_put_contents('logs/bot.log', "Received update: " . file_get_contents('php://input') . PHP_EOL, FILE_APPEND);
 
-$bot->run(); 
+$bot->run();
