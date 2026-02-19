@@ -1,5 +1,5 @@
 {
-    "name": "shizuku-bot",
+    "name": "shizuku/shizuku-bot",
     "description": "Shizuku Murasaki Telegram Bot",
     "require": {
         "nutgram/nutgram": "^4.5",
